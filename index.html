@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>College Cultural & Technical Fairness Portal</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0A2B8B, #8B0A0A, #0A2B8B);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    h1 { color: #7FFF9E; margin-bottom: 15px; font-size: 2rem; }
+    h2 { color: #7FFF9E; margin-bottom: 10px; font-size: 1.8rem; }
+    p { color: #ddd; margin-bottom: 20px; }
+    input, select, textarea {
+      width: 100%; padding: 10px; margin: 5px 0 15px;
+      border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.2); color: white;
+    }
+    button {
+      background: linear-gradient(to right, #008000, #0066FF);
+      border: none; padding: 10px 20px; border-radius: 10px;
+      color: white; font-weight: bold; cursor: pointer; margin-top: 10px;
+    }
+    button:hover { opacity: 0.9; }
+    .nav-btns button {
+      background: linear-gradient(to right, #8B0000, #00008B);
+      margin: 5px;
+    }
+    .hidden { display: none; }
+    ul { text-align: left; margin-bottom: 20px; color: #eee; }
+    li { margin: 6px 0; }
+    footer {
+      margin-top: 20px; font-size: 0.9rem; color: #aaa; border-top: 1px solid rgba(255,255,255,0.2);
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="main-container">
+    <h1>College Cultural & Technical Fairness Portal 🎭💻</h1>
+    <p>A vibrant and inclusive platform ensuring fair participation, unbiased judging, transparent results, and equal opportunities for every student.</p>
+
+    <!-- Login / Signup Section -->
+    <div id="auth-section">
+      <form id="auth-form">
+        <div id="signup-extra" class="hidden">
+          <label>Full Name</label>
+          <input type="text" id="name" placeholder="Your full name" required>
+          <label>Department</label>
+          <input type="text" id="department" placeholder="Enter department (CSE, ECE...)" />
+          <label>Year of Study</label>
+          <select id="year">
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+          </select>
+        </div>
+
+        <label>Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <div id="confirm-password-field" class="hidden">
+          <label>Confirm Password</label>
+          <input type="password" id="confirm" placeholder="Confirm password">
+        </div>
+
+        <button type="submit" id="submit-btn">Login</button>
+        <p id="toggle-text">Don't have an account? <span id="toggle-mode" style="color:#7FFF9E; cursor:pointer;">Sign Up</span></p>
+      </form>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboard" class="hidden">
+      <div class="nav-btns">
+        <button onclick="showPage('home')">Home</button>
+        <button onclick="showPage('cultural')">Cultural</button>
+        <button onclick="showPage('technical')">Technical</button>
+        <button onclick="showPage('college')">College Info</button>
+      </div>
+
+      <div id="page-content">
+        <h2>Welcome to the Fairness Portal 🎉</h2>
+        <p>Choose a section from above to explore Cultural, Technical, or College event details and submit feedback or polls.</p>
+      </div>
+
+      <button onclick="logout()">Logout</button>
+    </div>
+
+    <footer>
+      <p>© 2025 College Cultural & Technical Fairness Portal</p>
+      <p>Created with ❤️ by Jahnavi, Prathiksha, Kavya & Mirunaleni — Promoting Inclusion & Fairness</p>
+    </footer>
+  </div>
+
+  <script>
+    let isSignup = false;
+    const authSection = document.getElementById('auth-section');
+    const dashboard = document.getElementById('dashboard');
+    const toggleMode = document.getElementById('toggle-mode');
+    const signupExtra = document.getElementById('signup-extra');
+    const confirmField = document.getElementById('confirm-password-field');
+    const submitBtn = document.getElementById('submit-btn');
+    const toggleText = document.getElementById('toggle-text');
+
+    toggleMode.addEventListener('click', () => {
+      isSignup = !isSignup;
+      signupExtra.classList.toggle('hidden');
+      confirmField.classList.toggle('hidden');
+      submitBtn.textContent = isSignup ? "Sign Up" : "Login";
+      toggleText.innerHTML = isSignup
+        ? 'Already have an account? <span id="toggle-mode" style="color:#7FFF9E; cursor:pointer;">Login</span>'
+        : 'Don\'t have an account? <span id="toggle-mode" style="color:#7FFF9E; cursor:pointer;">Sign Up</span>';
+      toggleText.querySelector("#toggle-mode").addEventListener("click", toggleMode.click);
+    });
+
+    document.getElementById("auth-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      alert(isSignup ? "Account Created Successfully!" : "Login Successful!");
+      authSection.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+    });
+
+    function logout() {
+      dashboard.classList.add("hidden");
+      authSection.classList.remove("hidden");
+    }
+
+    function showPage(page) {
+      const content = document.getElementById("page-content");
+      if (page === "cultural") {
+        content.innerHTML = `
+          <h2>Cultural Events 🎭</h2>
+          <p>Celebrate art, dance, drama, and music with fair participation and transparent judging.</p>
+          <ul>
+            <li>Dance Mania – Classical, Folk, and Western</li>
+            <li>Drama Fest – Mime, Play, and Monologue</li>
+            <li>Music Night – Solo, Band, and Instrumental</li>
+            <li>Art Exhibition & Photography Showcase</li>
+          </ul>
+          <form>
+            <label>Select Event</label>
+            <select>
+              <option>Dance</option>
+              <option>Music</option>
+              <option>Drama</option>
+              <option>Art</option>
+            </select>
+            <label>Was the judging fair?</label>
+            <select>
+              <option>Yes</option>
+              <option>No</option>
+              <option>Partially</option>
+            </select>
+            <textarea placeholder="Your suggestions..."></textarea>
+            <button type="button" onclick="alert('Feedback submitted!')">Submit Feedback</button>
+          </form>`;
+      } else if (page === "technical") {
+        content.innerHTML = `
+          <h2>Technical Events 💻</h2>
+          <p>Innovate and compete with fairness and creativity in various technical challenges.</p>
+          <ul>
+            <li>Hackathon 2.0 – Code for Impact</li>
+            <li>RoboRace & Drone Showdown</li>
+            <li>Idea Pitch Competition</li>
+            <li>Gaming Tournament</li>
+          </ul>
+          <form>
+            <label>Select Event</label>
+            <select>
+              <option>Hackathon</option>
+              <option>RoboRace</option>
+              <option>Drone</option>
+              <option>Idea Pitch</option>
+            </select>
+            <label>Was the event selection fair?</label>
+            <select>
+              <option>Yes</option>
+              <option>No</option>
+              <option>Partially</option>
+            </select>
+            <textarea placeholder="Suggestions or improvements..."></textarea>
+            <button type="button" onclick="alert('Feedback submitted!')">Submit Feedback</button>
+          </form>`;
+      } else if (page === "college") {
+        content.innerHTML = `
+          <h2>College Details 🏫</h2>
+          <p>Learn about our campus, event locations, and student participation guidelines.</p>
+          <ul>
+            <li>Venue: Main Auditorium, Seminar Halls, Tech Labs</li>
+            <li>Departments: CSE, ECE, EEE, MECH, CIVIL</li>
+            <li>Student Clubs: Cultural Crew, CodeHub, Innovators, Art Society</li>
+            <li>Annual Fest: NovaFest 2025</li>
+          </ul>`;
+      } else {
+        content.innerHTML = `
+          <h2>Welcome to the Fairness Portal 🎉</h2>
+          <p>Choose a section from above to explore Cultural, Technical, or College event details and submit feedback or polls.</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
