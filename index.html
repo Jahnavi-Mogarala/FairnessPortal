@@ -1,223 +1,830 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>College Cultural & Technical Fairness Portal</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    /* Basic reset & theme */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, system-ui, Arial; }
+    :focus { outline: 3px solid rgba(125, 200, 255, 0.45); outline-offset: 2px; }
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #0A2B8B, #8B0A0A, #0A2B8B);
-      color: white;
+      background: linear-gradient(135deg,#0A2B8B 0%, #8B0A0A 50%, #0A2B8B 100%);
+      color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
     }
     .container {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 900px;
       width: 100%;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      text-align: center;
+      max-width: 1200px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.45);
     }
-    h1 { color: #7FFF9E; margin-bottom: 15px; font-size: 2rem; }
-    h2 { color: #7FFF9E; margin-bottom: 10px; font-size: 1.8rem; }
-    p { color: #ddd; margin-bottom: 20px; }
-    input, select, textarea {
-      width: 100%; padding: 10px; margin: 5px 0 15px;
-      border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);
-      background: rgba(255,255,255,0.2); color: white;
-    }
-    button {
-      background: linear-gradient(to right, #008000, #0066FF);
-      border: none; padding: 10px 20px; border-radius: 10px;
-      color: white; font-weight: bold; cursor: pointer; margin-top: 10px;
-    }
-    button:hover { opacity: 0.9; }
-    .nav-btns button {
-      background: linear-gradient(to right, #8B0000, #00008B);
-      margin: 5px;
-    }
-    .hidden { display: none; }
-    ul { text-align: left; margin-bottom: 20px; color: #eee; }
-    li { margin: 6px 0; }
-    footer {
-      margin-top: 20px; font-size: 0.9rem; color: #aaa; border-top: 1px solid rgba(255,255,255,0.2);
-      padding-top: 10px;
+    header { text-align: center; margin-bottom: 12px; }
+    header h1 { color: #7FFF9E; font-size: 1.8rem; margin-bottom: 6px; }
+    header p { color: #E6EEF6; opacity: .95; font-size:0.95rem; }
+
+    .top-grid { display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap; align-items:flex-start; }
+    .card { background: rgba(255,255,255,0.03); padding:12px; border-radius:10px; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+    .auth { max-width:420px; width:100%; }
+    form label { display:block; margin-bottom:6px; color:#DCEFFF; font-size:0.9rem; }
+    input, select, textarea, button { font-size: 0.95rem; }
+    input, select, textarea { width:100%; padding:10px; border-radius:8px; background: rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.08); margin-bottom:10px; }
+    textarea { min-height:80px; resize:vertical; }
+    button { cursor:pointer; padding:10px 12px; border-radius:8px; border:none; font-weight:600; color:#fff; }
+    .primary { background: linear-gradient(90deg,#128C4A,#1E90FF); }
+    .accent { background: linear-gradient(90deg,#8B0000,#00008B); }
+
+    .nav { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; justify-content:center; }
+    .nav button { padding:8px 12px; border-radius:8px; }
+
+    .hidden { display:none; }
+    .page { padding:12px 4px; }
+    .section-title { font-size:1.15rem; color:#B7FFD5; margin-bottom:8px; }
+
+    .two-col { display:grid; grid-template-columns:1fr 320px; gap:12px; align-items:start; }
+    .two-col.small { grid-template-columns:1fr 1fr; }
+
+    table { width:100%; border-collapse:collapse; margin-top:8px; color:#fff; }
+    th, td { padding:8px; border-bottom:1px solid rgba(255,255,255,0.06); text-align:left; font-size:0.9rem; }
+    .small { font-size:0.88rem; color:#cfeaff; opacity:0.95; }
+    footer { margin-top:12px; font-size:0.9rem; color:#c6d7ff; opacity:0.95; border-top: 1px solid rgba(255,255,255,0.03); padding-top:10px; text-align:center; }
+
+    .badge { display:inline-block; padding:6px 8px; border-radius:8px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); margin-right:6px; font-size:0.85rem; }
+
+    /* Toast notifications */
+    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 9999; display:flex; flex-direction:column; gap:8px; }
+    .toast-item { background: rgba(0,0,0,0.7); padding:10px 12px; border-radius:8px; color:#fff; box-shadow:0 6px 18px rgba(0,0,0,0.6); }
+
+    /* responsive */
+    @media (max-width:1000px) {
+      .two-col { grid-template-columns: 1fr; }
+      .top-grid { flex-direction: column; align-items:center; }
     }
   </style>
 </head>
 <body>
-  <div class="container" id="main-container">
-    <h1>College Cultural & Technical Fairness Portal 🎭💻</h1>
-    <p>A vibrant and inclusive platform ensuring fair participation, unbiased judging, transparent results, and equal opportunities for every student.</p>
+  <div class="container" id="app" role="application" aria-label="College Fairness Portal">
+    <header>
+      <h1>College Cultural & Technical Fairness Portal 🎭💻</h1>
+      <p>Transparent selection · Inclusive participation · Fair judging — Built by Mogarala Jahnavi, Prathiksha, Rithikaa, Kavya & Mirunaleni</p>
+    </header>
 
-    <!-- Login / Signup Section -->
-    <div id="auth-section">
-      <form id="auth-form">
-        <div id="signup-extra" class="hidden">
-          <label>Full Name</label>
-          <input type="text" id="name" placeholder="Your full name" required>
-          <label>Department</label>
-          <input type="text" id="department" placeholder="Enter department (CSE, ECE...)" />
-          <label>Year of Study</label>
-          <select id="year">
-            <option>1st Year</option>
-            <option>2nd Year</option>
-            <option>3rd Year</option>
-            <option>4th Year</option>
-          </select>
-        </div>
-
-        <label>Email</label>
-        <input type="email" id="email" placeholder="Enter your email" required>
-        <label>Password</label>
-        <input type="password" id="password" placeholder="Enter your password" required>
-        <div id="confirm-password-field" class="hidden">
-          <label>Confirm Password</label>
-          <input type="password" id="confirm" placeholder="Confirm password">
-        </div>
-
-        <button type="submit" id="submit-btn">Login</button>
-        <p id="toggle-text">Don't have an account? <span id="toggle-mode" style="color:#7FFF9E; cursor:pointer;">Sign Up</span></p>
-      </form>
-    </div>
-
-    <!-- Dashboard Section -->
-    <div id="dashboard" class="hidden">
-      <div class="nav-btns">
-        <button onclick="showPage('home')">Home</button>
-        <button onclick="showPage('cultural')">Cultural</button>
-        <button onclick="showPage('technical')">Technical</button>
-        <button onclick="showPage('college')">College Info</button>
+    <div class="top-grid" role="region" aria-label="Top controls">
+      <!-- Auth Card -->
+      <div class="card auth" id="auth-card" aria-labelledby="auth-heading">
+        <div id="auth-heading" class="section-title">Login / Sign Up</div>
+        <form id="auth-form" aria-describedby="auth-tip">
+          <div id="signup-fields" class="hidden" aria-hidden="true">
+            <label for="fullName">Full Name</label>
+            <input id="fullName" placeholder="Your name" />
+            <label for="dept">Department</label>
+            <input id="dept" placeholder="CSE, ECE..." />
+            <label for="yearSel">Year</label>
+            <select id="yearSel"><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select>
+          </div>
+          <label for="authEmail">Email</label><input id="authEmail" type="email" required aria-required="true" />
+          <label for="authPassword">Password</label><input id="authPassword" type="password" required />
+          <div id="confirmDiv" class="hidden" aria-hidden="true">
+            <label for="authConfirm">Confirm Password</label><input id="authConfirm" type="password" />
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button id="submitAuth" class="primary" type="submit">Login</button>
+            <button id="toggleAuth" type="button" class="accent" aria-pressed="false">Sign Up</button>
+          </div>
+          <div id="auth-tip" class="small" style="margin-top:8px;">Tip: this demo stores data in-memory. Export before closing to save data.</div>
+        </form>
       </div>
 
-      <div id="page-content">
-        <h2>Welcome to the Fairness Portal 🎉</h2>
-        <p>Choose a section from above to explore Cultural, Technical, or College event details and submit feedback or polls.</p>
+      <!-- Quick Stats / Controls -->
+      <div class="card" style="min-width:280px;" aria-live="polite">
+        <div class="section-title">Quick Actions & Status</div>
+        <div style="display:flex;flex-direction:column; gap:8px">
+          <button id="openDashboard" class="primary">Open Dashboard</button>
+          <button id="openReports" class="accent">Open Reports</button>
+          <button id="openPolls" style="background:linear-gradient(90deg,#0066FF,#00A86B)">Polls</button>
+        </div>
+        <hr style="margin:12px 0; border:none; border-top:1px solid rgba(255,255,255,0.04)" />
+        <div class="small">Status: <span id="statusBadge" class="badge">Not logged in</span></div>
+        <div style="margin-top:8px;" class="small">Exports: <span id="exportCount">0</span></div>
       </div>
-
-      <button onclick="logout()">Logout</button>
     </div>
 
-    <footer>
-  <p>© 2025 College Cultural & Technical Fairness Portal</p>
-  <p>Created with ❤️ by Mogarala Jahnavi, Prathiksha, Rithikaa, Kavya & Mirunaleni — Promoting Inclusion & Fairness</p>
-</footer>
+    <!-- Navigation -->
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+      <button onclick="showPage('home')" class="accent">Home</button>
+      <button onclick="showPage('cultural')" class="primary">Cultural Events</button>
+      <button onclick="showPage('technical')" class="primary">Technical Events</button>
+      <button onclick="showPage('college')" class="accent">College Info</button>
+      <button onclick="showPage('leaderboard')" class="primary">Leaderboard</button>
+      <button onclick="showPage('polls')" class="accent">Polls</button>
+      <button onclick="showPage('reports')" class="primary">Reports</button>
+      <button onclick="showPage('admin')" class="accent">Admin</button>
+      <button onclick="showPage('settings')" class="primary">Settings</button>
+      <button onclick="showPage('conclusions')" class="accent">Conclusions</button>
+    </nav>
 
+    <!-- Page Content -->
+    <main class="page card" id="page" role="main" aria-live="polite">
+      <!-- dynamic content injected here -->
+      <div id="home-content">
+        <h2 class="section-title">Welcome</h2>
+        <p>Use this portal to register for events, submit feedback about selection fairness, vote in polls, and generate reports to improve transparency.</p>
+        <div class="two-col" style="margin-top:12px;">
+          <div class="card">
+            <h3 class="small">Quick Join</h3>
+            <label for="quickType">Event Type</label>
+            <select id="quickType"><option>Cultural</option><option>Technical</option></select>
+            <label for="quickEvent">Event</label>
+            <select id="quickEvent"><option>Dance Mania</option><option>Hackathon 2.0</option><option>Drama Fest</option><option>RoboRace</option></select>
+            <button class="primary" onclick="quickJoin()">Submit Interest</button>
+            <div style="margin-top:8px;" class="small">Interest recorded in the system (for admin tracking).</div>
+          </div>
+          <div class="card">
+            <h3 class="small">Live Stats</h3>
+            <div id="live-stats">Feedback items: 0</div>
+            <div style="margin-top:8px;">
+              <button onclick="showPage('reports')" class="accent">Open Reports</button>
+              <button onclick="manualExport()" style="background:#1E7FFF; border-radius:8px; padding:8px;">Export CSV</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer aria-label="Footer">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div>© 2025 College Cultural & Technical Fairness Portal</div>
+        <div>Created with ❤️ by Mogarala Jahnavi, Prathiksha, Rithikaa, Kavya & Mirunaleni — Promoting Inclusion & Fairness</div>
+      </div>
+    </footer>
   </div>
 
+  <!-- Toast container -->
+  <div id="toast" aria-live="polite" aria-atomic="true"></div>
+
   <script>
-    let isSignup = false;
-    const authSection = document.getElementById('auth-section');
-    const dashboard = document.getElementById('dashboard');
-    const toggleMode = document.getElementById('toggle-mode');
-    const signupExtra = document.getElementById('signup-extra');
-    const confirmField = document.getElementById('confirm-password-field');
-    const submitBtn = document.getElementById('submit-btn');
-    const toggleText = document.getElementById('toggle-text');
+    /*******************************
+     * In-memory data structures
+     *******************************/
+    const DATA = {
+      users: [], // {email, name, dept, year}
+      feedback: [], // {id, userEmail, eventType, eventName, fairness, comments, timestamp}
+      polls: [], // {id,title,options:{opt:count},open,createdAt}
+      settings: {
+        anonymousJudging: false,
+        rotateJudges: true,
+        realtimePolling: true
+      },
+      exports: [], // {id,type,when,rows}
+      notifications: [] // {id, text, when}
+    };
 
-    toggleMode.addEventListener('click', () => {
-      isSignup = !isSignup;
-      signupExtra.classList.toggle('hidden');
-      confirmField.classList.toggle('hidden');
-      submitBtn.textContent = isSignup ? "Sign Up" : "Login";
-      toggleText.innerHTML = isSignup
-        ? 'Already have an account? <span id="toggle-mode" style="color:#7FFF9E; cursor:pointer;">Login</span>'
-        : 'Don\'t have an account? <span id="toggle-mode" style="color:#7FFF9E; cursor:pointer;">Sign Up</span>';
-      toggleText.querySelector("#toggle-mode").addEventListener("click", toggleMode.click);
-    });
-
-    document.getElementById("auth-form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      alert(isSignup ? "Account Created Successfully!" : "Login Successful!");
-      authSection.classList.add("hidden");
-      dashboard.classList.remove("hidden");
-    });
-
-    function logout() {
-      dashboard.classList.add("hidden");
-      authSection.classList.remove("hidden");
+    // helper
+    function uid(prefix='id') { return prefix + '_' + Math.random().toString(36).slice(2,9); }
+    function now() { return new Date().toISOString(); }
+    function toast(msg) {
+      const container = document.getElementById('toast');
+      const div = document.createElement('div');
+      div.className = 'toast-item';
+      div.textContent = msg;
+      container.appendChild(div);
+      setTimeout(()=> { div.style.opacity=0; setTimeout(()=>div.remove(),400); }, 4500);
+      // log notification
+      DATA.notifications.push({id: uid('not'), text: msg, when: now()});
     }
 
-    function showPage(page) {
-      const content = document.getElementById("page-content");
-      if (page === "cultural") {
-        content.innerHTML = `
-          <h2>Cultural Events 🎭</h2>
-          <p>Celebrate art, dance, drama, and music with fair participation and transparent judging.</p>
-          <ul>
-            <li>Dance Mania – Classical, Folk, and Western</li>
-            <li>Drama Fest – Mime, Play, and Monologue</li>
-            <li>Music Night – Solo, Band, and Instrumental</li>
-            <li>Art Exhibition & Photography Showcase</li>
-          </ul>
-          <form>
-            <label>Select Event</label>
-            <select>
-              <option>Dance</option>
-              <option>Music</option>
-              <option>Drama</option>
-              <option>Art</option>
-            </select>
-            <label>Was the judging fair?</label>
-            <select>
-              <option>Yes</option>
-              <option>No</option>
-              <option>Partially</option>
-            </select>
-            <textarea placeholder="Your suggestions..."></textarea>
-            <button type="button" onclick="alert('Feedback submitted!')">Submit Feedback</button>
-          </form>`;
-      } else if (page === "technical") {
-        content.innerHTML = `
-          <h2>Technical Events 💻</h2>
-          <p>Innovate and compete with fairness and creativity in various technical challenges.</p>
-          <ul>
-            <li>Hackathon 2.0 – Code for Impact</li>
-            <li>RoboRace & Drone Showdown</li>
-            <li>Idea Pitch Competition</li>
-            <li>Gaming Tournament</li>
-          </ul>
-          <form>
-            <label>Select Event</label>
-            <select>
-              <option>Hackathon</option>
-              <option>RoboRace</option>
-              <option>Drone</option>
-              <option>Idea Pitch</option>
-            </select>
-            <label>Was the event selection fair?</label>
-            <select>
-              <option>Yes</option>
-              <option>No</option>
-              <option>Partially</option>
-            </select>
-            <textarea placeholder="Suggestions or improvements..."></textarea>
-            <button type="button" onclick="alert('Feedback submitted!')">Submit Feedback</button>
-          </form>`;
-      } else if (page === "college") {
-        content.innerHTML = `
-          <h2>College Details 🏫</h2>
-          <p>Learn about our campus, event locations, and student participation guidelines.</p>
-          <ul>
-            <li>Venue: Main Auditorium, Seminar Halls, Tech Labs</li>
-            <li>Departments: CSE, ECE, EEE, MECH, CIVIL</li>
-            <li>Student Clubs: Cultural Crew, CodeHub, Innovators, Art Society</li>
-            <li>Annual Fest: NovaFest 2025</li>
-          </ul>`;
+    /*******************************
+     * Auth handling (in-memory)
+     *******************************/
+    let currentUser = null;
+    const statusBadge = document.getElementById('statusBadge');
+    const authForm = document.getElementById('auth-form');
+    const signupFields = document.getElementById('signup-fields');
+    const confirmDiv = document.getElementById('confirmDiv');
+    const submitAuth = document.getElementById('submitAuth');
+    const toggleAuth = document.getElementById('toggleAuth');
+    let isSignUpMode = false;
+
+    toggleAuth.addEventListener('click', () => {
+      isSignUpMode = !isSignUpMode;
+      signupFields.classList.toggle('hidden');
+      signupFields.setAttribute('aria-hidden', isSignUpMode ? 'false' : 'true');
+      confirmDiv.classList.toggle('hidden');
+      confirmDiv.setAttribute('aria-hidden', isSignUpMode ? 'false' : 'true');
+      submitAuth.textContent = isSignUpMode ? 'Create Account' : 'Login';
+      toggleAuth.textContent = isSignUpMode ? 'Cancel' : 'Sign Up';
+      toggleAuth.setAttribute('aria-pressed', isSignUpMode.toString());
+    });
+
+    authForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim();
+      const pwd = document.getElementById('authPassword').value;
+      if (!email || !pwd) return alert('Provide email and password.');
+
+      if (isSignUpMode) {
+        const name = document.getElementById('fullName').value.trim();
+        const dept = document.getElementById('dept').value.trim();
+        const year = document.getElementById('yearSel').value;
+        const confirm = document.getElementById('authConfirm').value;
+        if (pwd !== confirm) return alert('Passwords do not match.');
+        DATA.users.push({email, name: name || 'Student', dept: dept || 'Unknown', year});
+        currentUser = {email, name: name || 'Student', dept: dept || 'Unknown', year};
+        afterLogin();
       } else {
-        content.innerHTML = `
-          <h2>Welcome to the Fairness Portal 🎉</h2>
-          <p>Choose a section from above to explore Cultural, Technical, or College event details and submit feedback or polls.</p>`;
+        const u = DATA.users.find(u => u.email === email);
+        if (u) { currentUser = u; }
+        else { currentUser = {email, name: 'Guest', dept: 'Unknown', year:'N/A'}; }
+        afterLogin();
+      }
+    });
+
+    function afterLogin() {
+      statusBadge.textContent = currentUser ? currentUser.email : 'Not logged in';
+      document.getElementById('auth-card').classList.add('hidden');
+      toast('Login successful — welcome ' + (currentUser.name || currentUser.email));
+      showPage('home');
+      updateStatus();
+    }
+
+    document.getElementById('openDashboard').addEventListener('click', () => { document.getElementById('auth-card').classList.add('hidden'); showPage('home'); });
+    document.getElementById('openReports').addEventListener('click', () => { showPage('reports'); });
+    document.getElementById('openPolls').addEventListener('click', () => { showPage('polls'); });
+
+    function updateStatus() {
+      const s = document.getElementById('statusBadge');
+      if (currentUser) {
+        s.textContent = currentUser.email;
+        s.style.background = 'linear-gradient(90deg,#00c853,#2962ff)';
+      } else {
+        s.textContent = 'Not logged in';
+        s.style.background = '';
       }
     }
+
+    /*******************************
+     * Page rendering logic
+     *******************************/
+    const page = document.getElementById('page');
+    function showPage(name) {
+      page.innerHTML = '';
+      switch(name) {
+        case 'home': renderHome(); break;
+        case 'cultural': renderCultural(); break;
+        case 'technical': renderTechnical(); break;
+        case 'college': renderCollege(); break;
+        case 'reports': renderReports(); break;
+        case 'admin': renderAdmin(); break;
+        case 'settings': renderSettings(); break;
+        case 'conclusions': renderConclusions(); break;
+        case 'leaderboard': renderLeaderboard(); break;
+        case 'polls': renderPolls(); break;
+        default: renderHome();
+      }
+    }
+
+    /***** HOME *****/
+    function renderHome() {
+      page.innerHTML = `
+        <h2 class="section-title">Welcome</h2>
+        <p>Quick actions, live stats, and shortcuts to polls, reports, and admin tools.</p>
+        <div class="two-col" style="margin-top:12px;">
+          <div class="card">
+            <h3 class="small">Quick Join</h3>
+            <label for="quickType">Event Type</label>
+            <select id="quickType"><option>Cultural</option><option>Technical</option></select>
+            <label for="quickEvent">Event</label>
+            <select id="quickEvent"><option>Dance Mania</option><option>Hackathon 2.0</option><option>Drama Fest</option><option>RoboRace</option></select>
+            <button class="primary" onclick="quickJoin()">Submit Interest</button>
+            <div style="margin-top:8px;" class="small">Interest recorded in the system (for admin tracking).</div>
+          </div>
+          <div class="card">
+            <h3 class="small">Live Stats</h3>
+            <div id="live-stats">Feedback items: ${DATA.feedback.length}</div>
+            <div style="margin-top:8px;">
+              <button onclick="showPage('reports')" class="accent">Open Reports</button>
+              <button onclick="manualExport()" style="background:#1E7FFF; border-radius:8px; padding:8px;">Export CSV</button>
+            </div>
+            <div style="margin-top:10px;" class="small">Realtime Polls: ${DATA.polls.filter(p=>p.open).length} open</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function quickJoin() {
+      const type = document.getElementById('quickType').value;
+      const event = document.getElementById('quickEvent').value;
+      const email = DATA.settings.anonymousJudging ? 'anonymous' : (currentUser ? currentUser.email : 'guest');
+      DATA.feedback.push({ id: uid('fb'), userEmail: email, eventType: type, eventName: event, fairness:'Registered', comments:'Registered interest', timestamp: now() });
+      toast('Interest recorded: ' + event);
+      showPage('home'); updateLiveStats();
+    }
+
+    function updateLiveStats() {
+      const el = document.getElementById('live-stats');
+      if (el) el.textContent = 'Feedback items: ' + DATA.feedback.length;
+      const ec = document.getElementById('exportCount'); if(ec) ec.textContent = DATA.exports.length;
+    }
+
+    /***** CULTURAL *****/
+    function renderCultural() {
+      page.innerHTML = `
+        <h2 class="section-title">Cultural Events</h2>
+        <p>Register and submit post-event feedback.</p>
+        <div class="two-col">
+          <div class="card">
+            <h3 class="small">Events</h3>
+            <ul>
+              <li>Dance Mania – Classical, Folk, Western</li>
+              <li>Drama Fest – Play, Mime, Monologue</li>
+              <li>Music Night – Solo, Band</li>
+              <li>Art Exhibition & Photography</li>
+            </ul>
+            <button class="primary" onclick="showRegisterForm('Cultural')">Register</button>
+          </div>
+          <div class="card">
+            <h3 class="small">Feedback</h3>
+            <label for="culturalEventSel">Event</label>
+            <select id="culturalEventSel"><option>Dance Mania</option><option>Drama Fest</option><option>Music Night</option><option>Art Exhibition</option></select>
+            <label for="culturalFairSel">Was selection/judging fair?</label>
+            <select id="culturalFairSel"><option>Very Fair</option><option>Somewhat Fair</option><option>Unfair</option></select>
+            <label for="culturalComments">Comments</label>
+            <textarea id="culturalComments" placeholder="Your feedback..."></textarea>
+            <button class="primary" onclick="submitFeedback('Cultural')">Submit Feedback</button>
+            <div style="margin-top:8px;" class="small">Tip: Be specific (judge names, scoring anomalies) for better actionability.</div>
+          </div>
+        </div>
+      `;
+    }
+
+    /***** TECHNICAL *****/
+    function renderTechnical() {
+      page.innerHTML = `
+        <h2 class="section-title">Technical Events</h2>
+        <p>Register for hackathons, robotics competitions and submit feedback.</p>
+        <div class="two-col">
+          <div class="card">
+            <h3 class="small">Events</h3>
+            <ul>
+              <li>Hackathon 2.0 – Code for Impact</li>
+              <li>RoboRace & Drone Showdown</li>
+              <li>Idea Pitch Competition</li>
+              <li>AI Coding Jam</li>
+            </ul>
+            <button class="primary" onclick="showRegisterForm('Technical')">Register</button>
+          </div>
+          <div class="card">
+            <h3 class="small">Feedback</h3>
+            <label for="techEventSel">Event</label>
+            <select id="techEventSel"><option>Hackathon 2.0</option><option>RoboRace</option><option>Drone</option><option>AI Coding Jam</option></select>
+            <label for="techFairSel">Was selection/judging fair?</label>
+            <select id="techFairSel"><option>Very Fair</option><option>Somewhat Fair</option><option>Unfair</option></select>
+            <label for="techComments">Comments</label>
+            <textarea id="techComments" placeholder="Your feedback..."></textarea>
+            <button class="primary" onclick="submitFeedback('Technical')">Submit Feedback</button>
+            <div style="margin-top:8px;" class="small">Tip: Attach evidence (screenshots) in admin panel upload for disputes in production.</div>
+          </div>
+        </div>
+      `;
+    }
+
+    /***** REGISTER FORM modal-like (simple) *****/
+    function showRegisterForm(type) {
+      const name = prompt(type + ' Registration — Enter your name (Cancel to abort):', currentUser ? currentUser.name : '');
+      if (name === null) return;
+      const eventName = prompt('Enter event name:', (type==='Cultural') ? 'Dance Mania' : 'Hackathon 2.0');
+      if (!eventName) return;
+      DATA.feedback.push({ id: uid('fb'), userEmail: DATA.settings.anonymousJudging ? 'anonymous' : (currentUser ? currentUser.email : 'guest'), eventType: type, eventName, fairness:'Registered', comments:'Registered via quick form by ' + (name||'guest'), timestamp: now() });
+      toast('Registered: ' + eventName);
+      updateLiveStats();
+    }
+
+    /***** SUBMIT FEEDBACK *****/
+    function submitFeedback(type) {
+      const eventSel = document.getElementById((type === 'Cultural') ? 'culturalEventSel' : 'techEventSel').value;
+      const fairness = document.getElementById((type === 'Cultural') ? 'culturalFairSel' : 'techFairSel').value;
+      const comments = document.getElementById((type === 'Cultural') ? 'culturalComments' : 'techComments').value;
+      const email = DATA.settings.anonymousJudging ? 'anonymous' : (currentUser ? currentUser.email : 'guest');
+      DATA.feedback.push({ id: uid('fb'), userEmail: email, eventType: type, eventName: eventSel, fairness, comments: comments||'', timestamp: now() });
+      toast('Feedback submitted for ' + eventSel);
+      if(type==='Cultural') document.getElementById('culturalComments').value=''; else document.getElementById('techComments').value='';
+      updateLiveStats();
+    }
+
+    /***** AGGREGATION & Leaderboard *****/
+    function aggregateFeedback() {
+      const agg = {};
+      DATA.feedback.forEach(f => {
+        const key = f.eventName || f.eventType || 'Unknown';
+        if (!agg[key]) agg[key] = { total:0, very:0, some:0, unfair:0, registered:0, comments:[] };
+        agg[key].total++;
+        if (f.fairness === 'Very Fair') agg[key].very++;
+        else if (f.fairness === 'Somewhat Fair') agg[key].some++;
+        else if (f.fairness === 'Unfair') agg[key].unfair++;
+        else if (f.fairness === 'Registered') agg[key].registered++;
+        if (f.comments) agg[key].comments.push(f.comments);
+      });
+      return agg;
+    }
+
+    function renderLeaderboard() {
+      const agg = aggregateFeedback();
+      const entries = Object.entries(agg).map(([name, v]) => {
+        // score formula: +2*very + 1*some - 2*unfair + 0.5*registered
+        const score = (v.very * 2) + (v.some * 1) - (v.unfair * 2) + (v.registered * 0.5);
+        return { name, score: Math.round(score*10)/10, ...v };
+      }).sort((a,b)=>b.score - a.score);
+      page.innerHTML = `
+        <h2 class="section-title">Event Leaderboard</h2>
+        <p>Ranked by positive fairness score (higher = better).</p>
+        <div class="card">
+          ${entries.length ? `<table aria-label="Leaderboard"><thead><tr><th>Rank</th><th>Event</th><th>Score</th><th>Responses</th></tr></thead>
+            <tbody>${entries.map((e,i)=>`<tr><td>${i+1}</td><td>${e.name}</td><td>${e.score}</td><td>${e.total}</td></tr>`).join('')}</tbody></table>` : '<div class="small">No feedback yet.</div>'}
+        </div>
+      `;
+    }
+
+    /***** REPORTS (aggregations) *****/
+    function renderReports() {
+      const agg = aggregateFeedback();
+      page.innerHTML = `
+        <h2 class="section-title">Reports & Exports</h2>
+        <div class="two-col">
+          <div class="card">
+            <h3 class="small">Aggregated Feedback</h3>
+            <div id="agg-list"></div>
+            <div style="margin-top:10px; display:flex; gap:8px;">
+              <button class="primary" onclick="downloadCSV()">Export CSV</button>
+              <button class="accent" onclick="downloadJSON()">Export JSON</button>
+            </div>
+            <div style="margin-top:6px;" class="small">Export log count: ${DATA.exports.length}</div>
+          </div>
+          <div class="card">
+            <h3 class="small">Insights & Tips</h3>
+            <div id="insights"></div>
+            <h4 style="margin-top:8px;">Feedback Tips</h4>
+            <div id="feedback-tips" class="small"></div>
+          </div>
+        </div>
+      `;
+      const aggList = document.getElementById('agg-list');
+      aggList.innerHTML = Object.keys(agg).length ? Object.keys(agg).map(k => {
+        const v = agg[k];
+        return `<div style="margin-bottom:10px; padding:8px; background:rgba(255,255,255,0.02);border-radius:8px;">
+          <strong>${k}</strong>
+          <div class="small">Total: ${v.total} • Very:${v.very} • Some:${v.some} • Unfair:${v.unfair} • Registered:${v.registered}</div>
+        </div>`;
+      }).join('') : '<div class="small">No feedback yet.</div>';
+
+      // insights
+      const insights = document.getElementById('insights');
+      const entries = Object.entries(agg).sort((a,b)=> (b[1].total - a[1].total));
+      insights.innerHTML = entries.length ? entries.slice(0,3).map(([k,v]) => `<div style="margin-bottom:8px;"><strong>${k}</strong><div class="small">${Math.round((v.very/v.total||0)*100)}% rated Very Fair • ${Math.round((v.unfair/v.total||0)*100)}% Unfair</div></div>`).join('') : '<div class="small">No data to show</div>';
+
+      // feedback tips
+      const tipsEl = document.getElementById('feedback-tips');
+      tipsEl.innerHTML = generateFeedbackTips(agg);
+      updateLiveStats();
+    }
+
+    function generateFeedbackTips(agg) {
+      // Simple tips based on counts and common keywords
+      const tips = [];
+      const keys = Object.keys(agg);
+      if (keys.length === 0) return 'No feedback yet. Prompt participants to give constructive feedback with the "why" and "evidence".';
+      // Overall unfairness
+      let total=0, unfair=0;
+      keys.forEach(k=> { total += agg[k].total; unfair += agg[k].unfair; });
+      const unfairPct = Math.round((unfair / Math.max(1,total))*100);
+      if (unfairPct > 30) tips.push('High unfair reports — publish scorecards and enable anonymous judging.');
+      else if (unfairPct > 10) tips.push('Moderate unfair reports — rotate judges and clarify criteria.');
+      else tips.push('Low unfair reports — maintain current judge training and transparency.');
+
+      // per-event tips
+      keys.forEach(k => {
+        const v = agg[k];
+        if (v.unfair > Math.max(1, v.very/2)) tips.push(`${k}: Review judging panel and request explanations for low scores.`);
+        if (v.comments.length > 0) tips.push(`${k}: Consider asking for structured evidence (score breakdown) when reviewing complaints.`);
+      });
+
+      // general tips
+      tips.push('Provide a clear scoring rubric ahead of the event.');
+      tips.push('Offer an appeals process with evidence upload.');
+      return tips.map(t=>`• ${t}`).join('<br>');
+    }
+
+    /***** EXPORT CSV / JSON & tracking *****/
+    function downloadCSV() {
+      if (DATA.feedback.length === 0) return alert('No feedback to export.');
+      const rows = [['id','user','eventType','eventName','fairness','comments','timestamp']];
+      DATA.feedback.forEach(f => rows.push([f.id,f.userEmail,f.eventType,f.eventName,f.fairness,(f.comments||'').replace(/\n/g,' '),f.timestamp]));
+      const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'feedback_export.csv'; a.click();
+      URL.revokeObjectURL(url);
+      DATA.exports.push({id: uid('exp'), type: 'csv', when: now(), rows: DATA.feedback.length});
+      toast('CSV exported — ' + DATA.feedback.length + ' rows');
+      updateLiveStats();
+    }
+    function downloadJSON() {
+      if (DATA.feedback.length === 0) return alert('No feedback to export.');
+      const blob = new Blob([JSON.stringify(DATA.feedback,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'feedback_export.json'; a.click();
+      URL.revokeObjectURL(url);
+      DATA.exports.push({id: uid('exp'), type: 'json', when: now(), rows: DATA.feedback.length});
+      toast('JSON exported');
+      updateLiveStats();
+    }
+    function manualExport() { downloadCSV(); }
+
+    /***** POLLS (Real-time) *****/
+    function renderPolls() {
+      page.innerHTML = `
+        <h2 class="section-title">Real-time Polls</h2>
+        <div class="two-col">
+          <div class="card">
+            <h3 class="small">Active Polls</h3>
+            <div id="poll-list"></div>
+            <hr style="margin:8px 0;border:none;border-top:1px solid rgba(255,255,255,0.04)">
+            <h4 class="small">Create Poll</h4>
+            <label>Title</label><input id="pollTitle" placeholder="e.g., Should judges be rotated?" />
+            <label>Options (comma separated)</label><input id="pollOptions" placeholder="Yes,No,Maybe" />
+            <button class="primary" onclick="createPoll()">Create Poll</button>
+          </div>
+          <div class="card">
+            <h3 class="small">Poll Insights</h3>
+            <div id="poll-insights" class="small">No polls yet.</div>
+            <div style="margin-top:10px;">
+              <button onclick="simulateRealtime()" class="accent">Simulate realtime votes</button>
+              <button onclick="stopSimulateRealtime()" style="background:#0066FF; margin-left:6px;">Stop</button>
+            </div>
+          </div>
+        </div>
+      `;
+      updatePollList();
+    }
+
+    function createPoll() {
+      const title = document.getElementById('pollTitle').value.trim();
+      const optsRaw = document.getElementById('pollOptions').value.trim();
+      if (!title || !optsRaw) return alert('Provide title and options.');
+      const options = {};
+      optsRaw.split(',').map(o => o.trim()).filter(Boolean).forEach(o=> options[o]=0);
+      const p = { id: uid('poll'), title, options, open:true, createdAt: now() };
+      DATA.polls.push(p);
+      toast('Poll created: ' + title);
+      document.getElementById('pollTitle').value=''; document.getElementById('pollOptions').value='';
+      updatePollList();
+    }
+
+    function updatePollList() {
+      const pollList = document.getElementById('poll-list');
+      if (!pollList) return;
+      if (DATA.polls.length===0) { pollList.innerHTML = '<div class="small">No polls yet.</div>'; return; }
+      pollList.innerHTML = DATA.polls.map(p => {
+        const optionsHtml = Object.keys(p.options).map(opt => `<button onclick="votePoll('${p.id}','${escapeJs(opt)}')" style="margin:4px;" class="primary">${opt} (${p.options[opt]})</button>`).join(' ');
+        const closeBtn = p.open ? `<button onclick="closePoll('${p.id}')" style="margin-left:8px;" class="accent">Close Poll</button>` : `<span class="small">Closed</span>`;
+        return `<div style="margin-bottom:12px; padding:8px; background:rgba(255,255,255,0.02); border-radius:8px;">
+          <strong>${p.title}</strong>
+          <div style="margin-top:6px;">${optionsHtml}</div>
+          <div style="margin-top:6px;">${closeBtn}</div>
+        </div>`;
+      }).join('');
+      updatePollInsights();
+    }
+
+    function escapeJs(s) { return s.replace(/'/g,"\\'").replace(/"/g,'\\"'); }
+
+    function votePoll(pollId, option) {
+      const p = DATA.polls.find(x=>x.id===pollId);
+      if (!p) return;
+      if (!p.open) return alert('This poll is closed.');
+      // vote
+      p.options[option] = (p.options[option]||0) + 1;
+      toast('Voted "' + option + '" on "' + p.title + '"');
+      updatePollList(); updatePollInsights();
+    }
+
+    function closePoll(pollId) {
+      const p = DATA.polls.find(x=>x.id===pollId);
+      if (!p) return;
+      p.open = false;
+      toast('Poll closed: ' + p.title);
+      updatePollList();
+    }
+
+    function updatePollInsights() {
+      const el = document.getElementById('poll-insights');
+      if (!el) return;
+      if (DATA.polls.length===0) { el.innerHTML = 'No polls yet.'; return; }
+      const insights = DATA.polls.map(p => {
+        const total = Object.values(p.options).reduce((a,b)=>a+b,0);
+        return `<div style="margin-bottom:8px;"><strong>${p.title}</strong><div class="small">Total votes: ${total} • Status: ${p.open ? 'Open' : 'Closed'}</div></div>`;
+      }).join('');
+      el.innerHTML = insights;
+    }
+
+    // simulation for 'real-time' votes
+    let simulateInterval = null;
+    function simulateRealtime() {
+      if (simulateInterval) return;
+      simulateInterval = setInterval(()=> {
+        if (DATA.polls.length===0) return;
+        // pick an open poll randomly and vote random option
+        const open = DATA.polls.filter(p=>p.open);
+        if (open.length===0) return;
+        const p = open[Math.floor(Math.random()*open.length)];
+        const opts = Object.keys(p.options);
+        const opt = opts[Math.floor(Math.random()*opts.length)];
+        p.options[opt]++;
+        updatePollList();
+        updatePollInsights();
+        toast('Realtime vote: ' + opt + ' on ' + p.title);
+      }, 2200);
+      toast('Realtime poll simulation started');
+    }
+    function stopSimulateRealtime() {
+      if (simulateInterval) clearInterval(simulateInterval);
+      simulateInterval = null;
+      toast('Realtime poll simulation stopped');
+    }
+
+    /***** ADMIN UI *****/
+    function renderAdmin() {
+      page.innerHTML = `
+        <h2 class="section-title">Admin Panel</h2>
+        <div class="two-col">
+          <div class="card">
+            <h3 class="small">Submissions</h3>
+            <div id="admin-submissions"></div>
+            <div style="margin-top:8px; display:flex; gap:8px;">
+              <button class="primary" onclick="downloadCSV()">Export CSV</button>
+              <button class="accent" onclick="downloadJSON()">Export JSON</button>
+              <button onclick="clearFeedback()" style="background:#FF3B30">Clear Feedback</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="small">Users & Exports</h3>
+            <div id="admin-users"></div>
+            <div style="margin-top:12px;">
+              <h4 class="small">Export Log</h4>
+              <div id="export-log" class="small"></div>
+            </div>
+            <div style="margin-top:10px;">
+              <h4 class="small">Notifications</h4>
+              <div id="admin-notifs" class="small"></div>
+            </div>
+          </div>
+        </div>
+      `;
+      updateAdminTables();
+    }
+
+    function updateAdminTables() {
+      const subDiv = document.getElementById('admin-submissions');
+      subDiv.innerHTML = DATA.feedback.length ? (`<table aria-label="Submissions"><thead><tr><th>ID</th><th>User</th><th>Event</th><th>Fairness</th><th>Time</th></tr></thead>
+        <tbody>${DATA.feedback.map(f=>`<tr><td>${f.id}</td><td>${f.userEmail}</td><td>${f.eventName} (${f.eventType})</td><td>${f.fairness}</td><td>${f.timestamp.split('T')[0]}</td></tr>`).join('')}</tbody></table>`) : '<div class="small">No submissions yet.</div>';
+      const userDiv = document.getElementById('admin-users');
+      userDiv.innerHTML = DATA.users.length ? (`<table><thead><tr><th>Email</th><th>Name</th><th>Dept</th></tr></thead>
+        <tbody>${DATA.users.map(u=>`<tr><td>${u.email}</td><td>${u.name}</td><td>${u.dept}</td></tr>`).join('')}</tbody></table>`) : '<div class="small">No registered users yet.</div>';
+      const exportLog = document.getElementById('export-log');
+      exportLog.innerHTML = DATA.exports.length ? DATA.exports.map(e=>`<div>${e.when.split('T')[0]} • ${e.type.toUpperCase()} • ${e.rows} rows</div>`).join('') : '<div class="small">No exports yet.</div>';
+      const notifs = document.getElementById('admin-notifs');
+      notifs.innerHTML = DATA.notifications.length ? DATA.notifications.slice().reverse().map(n=>`<div>${n.when.split('T')[0]} • ${n.text}</div>`).join('') : '<div class="small">No notifications</div>';
+    }
+
+    function downloadUsers() {
+      if (DATA.users.length===0) return alert('No users to export.');
+      const blob = new Blob([JSON.stringify(DATA.users,null,2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'users_export.json'; a.click();
+      URL.revokeObjectURL(url);
+      DATA.exports.push({id: uid('exp'), type: 'users', when: now(), rows: DATA.users.length});
+      toast('Users exported');
+      updateAdminTables();
+    }
+
+    function clearFeedback() {
+      if (!confirm('Clear all feedback? This cannot be undone.')) return;
+      DATA.feedback.length = 0;
+      toast('All feedback cleared');
+      updateAdminTables(); updateLiveStats();
+    }
+
+    /***** SETTINGS *****/
+    function renderSettings() {
+      page.innerHTML = `
+        <h2 class="section-title">Settings & Accessibility</h2>
+        <div class="two-col small">
+          <div class="card">
+            <h3 class="small">Fairness Settings</h3>
+            <label><input type="checkbox" id="anonymousCheck"> Enable anonymous feedback</label>
+            <label><input type="checkbox" id="rotateCheck"> Rotate judges annually</label>
+            <label><input type="checkbox" id="pollRealtime"> Realtime Polling (simulation)</label>
+            <button class="primary" id="saveSettings">Save Settings</button>
+          </div>
+          <div class="card">
+            <h3 class="small">Accessibility</h3>
+            <p class="small">Color contrast and keyboard focus added. For better accessibility, provide alt text for images and larger fonts option.</p>
+            <button onclick="seedSampleData()" class="accent">Seed sample data</button>
+            <button onclick="clearAll()" style="background:#FF3B30">Clear all data</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('anonymousCheck').checked = DATA.settings.anonymousJudging;
+      document.getElementById('rotateCheck').checked = DATA.settings.rotateJudges;
+      document.getElementById('pollRealtime').checked = DATA.settings.realtimePolling;
+      document.getElementById('saveSettings').addEventListener('click', () => {
+        DATA.settings.anonymousJudging = document.getElementById('anonymousCheck').checked;
+        DATA.settings.rotateJudges = document.getElementById('rotateCheck').checked;
+        DATA.settings.realtimePolling = document.getElementById('pollRealtime').checked;
+        toast('Settings saved');
+      });
+    }
+
+    function seedSampleData() {
+      // add sample users & feedback & poll
+      DATA.users.push({email:'alice@uni.edu', name:'Alice', dept:'CSE', year:'2nd Year'});
+      DATA.users.push({email:'bob@uni.edu', name:'Bob', dept:'ECE', year:'3rd Year'});
+      DATA.feedback.push({id:uid('fb'), userEmail:'alice@uni.edu', eventType:'Cultural', eventName:'Dance Mania', fairness:'Very Fair', comments:'Great judging', timestamp:now()});
+      DATA.feedback.push({id:uid('fb'), userEmail:'bob@uni.edu', eventType:'Technical', eventName:'Hackathon 2.0', fairness:'Somewhat Fair', comments:'Criteria unclear', timestamp:now()});
+      DATA.polls.push({id:uid('poll'), title:'Rotate judges yearly?', options:{Yes:2,No:1}, open:true, createdAt: now()});
+      toast('Sample data seeded');
+      updateAdminTables(); updateLiveStats();
+    }
+
+    function clearAll() {
+      if (!confirm('Clear ALL data?')) return;
+      DATA.users.length=0; DATA.feedback.length=0; DATA.polls.length=0; DATA.exports.length=0; DATA.notifications.length=0;
+      toast('All data cleared');
+      updateAdminTables(); updateLiveStats();
+      showPage('home');
+    }
+
+    /***** CONCLUSIONS & INSIGHTS *****/
+    function renderConclusions() {
+      const agg = aggregateFeedback();
+      page.innerHTML = `
+        <h2 class="section-title">Conclusions & Action Plan</h2>
+        <div class="two-col">
+          <div class="card">
+            <h3 class="small">Auto-generated Summary</h3>
+            <div id="conclusion-text">${generateConclusions(agg)}</div>
+            <div style="margin-top:10px;"><button class="primary" onclick="openActionPlan()">View Action Plan</button></div>
+          </div>
+          <div class="card">
+            <h3 class="small">Transparency Log</h3>
+            <div id="transparency-log">${(DATA.feedback.length ? DATA.feedback.slice(-8).map(f => `<div class="small">${f.timestamp.split('T')[0]} • ${f.eventName} • ${f.fairness}</div>`).join('') : '<div class="small">No entries yet</div>')}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function generateConclusions(agg) {
+      const keys = Object.keys(agg);
+      if (keys.length===0) return 'No feedback yet to generate conclusions.';
+      let totalResponses=0, totalUnfair=0;
+      keys.forEach(k=>{ totalResponses += agg[k].total; totalUnfair += agg[k].unfair; });
+      const unfairPct = Math.round((totalUnfair/Math.max(1,totalResponses))*100);
+      let res = `Total feedback: ${totalResponses}. Overall unfair feedback: ${unfairPct}%.`;
+      if (unfairPct > 30) res += ' Concern: high unfairness — immediate review recommended (scorecards + anonymous scoring).';
+      else if (unfairPct > 10) res += ' Moderate unfair reports — implement judge rotation and publish score rubrics.';
+      else res += ' Low unfair reports — current fairness mechanisms appear to work; continue monitoring.';
+      return res;
+    }
+
+    function openActionPlan() {
+      alert('Action Plan:\n1) Publish scorecards & rubrics.\n2) Rotate judges and ensure panel diversity.\n3) Enable anonymous judging and appeals process.\n4) Provide judge bias training and post-event transparency reporting.');
+    }
+
+    /***** POLLS UTILS EXPOSED *****/
+    window.showPage = showPage;
+    window.quickJoin = quickJoin;
+    window.submitFeedback = submitFeedback;
+    window.downloadCSV = downloadCSV;
+    window.downloadJSON = downloadJSON;
+    window.clearFeedback = clearFeedback;
+    window.generateConclusions = generateConclusions;
+    window.createPoll = createPoll;
+    window.votePoll = votePoll;
+    window.closePoll = closePoll;
+    window.simulateRealtime = simulateRealtime;
+    window.stopSimulateRealtime = stopSimulateRealtime;
+
+    // initial render
+    showPage('home');
+
+    // a light periodic updater: update some UI counts
+    setInterval(()=> { updateLiveStats(); if(document.querySelector('#page .section-title')?.textContent?.includes('Reports')) renderReports(); if(document.querySelector('#page .section-title')?.textContent?.includes('Admin')) updateAdminTables(); }, 3000);
   </script>
 </body>
 </html>
